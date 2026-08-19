@@ -45,45 +45,52 @@ class MultiHeadAttention(nn.Module):
         out = self.proj(out)
         return out
 
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
-class MultiHeadLM(nn.Module):
-    def __init__(self, vocab_size, embed_size, block_size, num_heads):
-        super().__init__()
-        self.block_size = block_size
-        self.token_embedding_table = nn.Embedding(vocab_size, embed_size)
-        self.position_embedding_table = nn.Embedding(block_size, embed_size)
+# This downloads a massive pre-trained brain onto your hard drive
+tokenizer = AutoTokenizer.from_pretrained("microsoft/Phi-3-mini-4k-instruct")
+model = AutoModelForCausalLM.from_pretrained("microsoft/Phi-3-mini-4k-instruct")
 
-        # Initialize our new Multi-Head Attention layer
-        head_size = embed_size // num_heads
-        self.sa_heads = MultiHeadAttention(num_heads, head_size, embed_size, block_size)
 
-        self.lm_head = nn.Linear(embed_size, vocab_size)
 
-    def forward(self, idx, targets=None):
-        B, T = idx.shape
-        tok_emb = self.token_embedding_table(idx)
-        pos_emb = self.position_embedding_table(torch.arange(T, device=idx.device))
-        x = tok_emb + pos_emb
-
-        # Pass data through the multi-head layer
-        x = self.sa_heads(x)
-        logits = self.lm_head(x)
-
-        loss = None
-        if targets is not None:
-            B, T, C = logits.shape
-            logits = logits.view(B * T, C)
-            targets = targets.view(B * T)
-            loss = F.cross_entropy(logits, targets)
-
-        return logits, loss
-
-    def generate(self, idx, max_new_tokens):
-        for _ in range(max_new_tokens):
-            idx_cond = idx[:, -self.block_size:]
-            logits, loss = self(idx_cond)
-            logits = logits[:, -1, :]
-            probs = F.softmax(logits, dim=-1)
-            idx_next = torch.multinomial(probs, num_samples=1)
-            idx = torch.cat((idx, idx_next), dim=1)
-        return idx
+# class MultiHeadLM(nn.Module):
+#     def __init__(self, vocab_size, embed_size, block_size, num_heads):
+#         super().__init__()
+#         self.block_size = block_size
+#         self.token_embedding_table = nn.Embedding(vocab_size, embed_size)
+#         self.position_embedding_table = nn.Embedding(block_size, embed_size)
+#
+#         # Initialize our new Multi-Head Attention layer
+#         head_size = embed_size // num_heads
+#         self.sa_heads = MultiHeadAttention(num_heads, head_size, embed_size, block_size)
+#
+#         self.lm_head = nn.Linear(embed_size, vocab_size)
+#
+#     def forward(self, idx, targets=None):
+#         B, T = idx.shape
+#         tok_emb = self.token_embedding_table(idx)
+#         pos_emb = self.position_embedding_table(torch.arange(T, device=idx.device))
+#         x = tok_emb + pos_emb
+#
+#         # Pass data through the multi-head layer
+#         x = self.sa_heads(x)
+#         logits = self.lm_head(x)
+#
+#         loss = None
+#         if targets is not None:
+#             B, T, C = logits.shape
+#             logits = logits.view(B * T, C)
+#             targets = targets.view(B * T)
+#             loss = F.cross_entropy(logits, targets)
+#
+#         return logits, loss
+#
+#     def generate(self, idx, max_new_tokens):
+#         for _ in range(max_new_tokens):
+#             idx_cond = idx[:, -self.block_size:]
+#             logits, loss = self(idx_cond)
+#             logits = logits[:, -1, :]
+#             probs = F.softmax(logits, dim=-1)
+#             idx_next = torch.multinomial(probs, num_samples=1)
+#             idx = torch.cat((idx, idx_next), dim=1)
+#         return idx
