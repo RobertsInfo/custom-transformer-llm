@@ -31,5 +31,23 @@ A complete, production-ready Large Language Model (LLM) engineering sandbox buil
 * Bypassing Remote Configuration Conflicts: Resolved a KeyError: 'type' crash by migrating from remote script execution (trust_remote_code=True) to the native codebase (trust_remote_code=False) with eager attention.
 * Unscripted Global Reasoning: Deployed a local chat pipeline capable of answering unscripted real-world inquiries (geography, coding, science) from its 3.8-billion pre-trained weights without local training files.
 
-------------------------------
+## 🌐 6. Live Web Search Agent Architecture (search_agent.py)
+
+* Internet Tool Integration: Integrated the duckduckgo-search library wrapper inside your workspace to serve as an on-demand external search tool.
+* Network Query Function: Programmed an isolated internet_search function with built-in network safety blocks (try/except) to scrape the top 3 live text snippets for any prompt you type.
+* Contextual Data Merging: Constructed a multi-layered user string block (user_payload) that catches raw internet snippets and injects them directly alongside your questions.
+
+## 🕵️‍♂️ 7. Algorithmic Debugging & Breakthroughs
+
+* Overriding Safety Safeguards: Discovered that smaller 3.8B foundation models contain rigid, hardcoded refusal scripts regarding their knowledge cutoff limits.
+* Role Alignment Refactoring: Discovered that Phi-3 ignores classic {"role": "system"} tags because it lacks a native system-token parser. Bypassed this limit completely by injecting your live web data directly into the active {"role": "user"} array, forcing the model to read the data.
+* Context Synthesis Victory: Tested and verified that your script successfully bypassed temporal amnesia to cleanly read, analyze, and print out live, unscripted historical milestones (such as the Tampa Bay Buccaneers game statistics) entirely from the scraped web context.
+
+## 📁 8. Version Control & Portfolio Discipline
+
+* Strategic Code Freezing: Applied a standard engineering rule ("If it works, don't touch it") to preserve your active runtime script architecture, opting to leave runtime warnings alone since the data pipeline is functional.
+* Git Synchronization: Successfully staged, committed, and pushed your complete search_agent.py script to your private GitHub repository, backing up your work safely online.
+
+
+
 
